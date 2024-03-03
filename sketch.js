@@ -95,13 +95,7 @@ function drawFingers() {
   noStroke();
   fill(255, 0, 0);
   if (predictions[0] && predictions[0].hasOwnProperty('annotations')) {
-    let index1 = predictions[0].annotations.indexFinger[0];
-    let index2 = predictions[0].annotations.indexFinger[1];
-    let index3 = predictions[0].annotations.indexFinger[2];
     let index4 = predictions[0].annotations.indexFinger[3];
-    // circle(index1[0], index1[1], index1[2]);
-    // circle(index2[0], index2[1], index2[2]);
-    // circle(index3[0], index3[1], index3[2]);
     circle(index4[0], index4[1], 10);// index4[2]);
   }
   pop();
