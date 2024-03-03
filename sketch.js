@@ -28,7 +28,11 @@ function modelReady() {
 function draw() {
   frameRate(30);
   if (modelLoaded) {
+    // mirror video and draw it to canvas
+    translate(width, 0);
+    scale(-1, 1);
     image(video, 0, 0, width, height);
+
     // We can call both functions to draw all keypoints and the skeletons
     // drawKeypoints();
     drawFingers();
