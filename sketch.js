@@ -23,12 +23,30 @@ function setup() {
 
   // create random ellipses
   for (let i = 0; i < 10; i++) {
-    let x = random(width);
-    let y = random(height);
-    let size = random(30, 70);
-    let fillColor = color(random(255), random(255), random(255));
+    let x, y, size, fillColor;
+    let overlapping = true;
+    while (overlapping) {
+      x = random(width);
+      y = random(height);
+      size = random(30, 70);
+      fillColor = color(random(255), random(255), random(255));
+      overlapping = checkOverlap(x, y, size);
+    }
     ellipsePositions.push({ x: x, y: y, size: size, fillColor: fillColor });
   }
+}
+
+// function to check if ellipse with other ellipse
+function checkOverlap(newX, newY, newSize) {
+  for (let i = 0; i < ellipsePositions.length; i++) {
+    let position = ellipsePositions[i];
+    let distance = dist(newX, newY, position.x, position.y);
+    let minDistance = newSize / 2 + position.size / 2;
+    if (distance < minDistance) {
+      return true; // overlapping with another ellipse
+    }
+  }
+  return false; // not overlapping
 }
 
 function modelReady() {
