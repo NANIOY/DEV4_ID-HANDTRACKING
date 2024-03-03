@@ -3,6 +3,7 @@ let video;
 let predictions = [];
 let modelLoaded = false;
 let ellipsePositions = [];
+let particles = [];
 
 function setup() {
   createCanvas(640, 480);
@@ -99,6 +100,9 @@ function drawFingers() {
       let distance = dist(index4[0], index4[1], position.x, position.y);
       let minDistance = 10 + position.size / 2;
       if (distance < minDistance) {
+        // create explosion particles at position of ellipse
+        createExplosion(position.x, position.y, position.fillColor);
+        // remove the ellipse from positions array
         ellipsePositions.splice(i, 1);
         break;
       }
@@ -115,4 +119,40 @@ function drawFingers() {
     circle(index4[0], index4[1], 10);// index4[2]);
   }
   pop();
+
+  // update and draw explosion particles
+  updateExplosion();
+}
+
+// function to create explosion particles at given position
+function createExplosion(x, y, color) {
+  for (let j = 0; j < 10; j++) {
+    let particle = {
+      x: x,
+      y: y,
+      vx: random(-2, 2),
+      vy: random(-2, 2),
+      alpha: 255,
+      size: random(2, 5),
+      color: color
+    };
+    particles.push(particle);
+  }
+}
+
+// function to update and draw explosion particles
+function updateExplosion() {
+  for (let i = particles.length - 1; i >= 0; i--) {
+    let particle = particles[i];
+    particle.x += particle.vx;
+    particle.y += particle.vy;
+    particle.alpha -= 10; // decrease alpha for fading effect
+    fill(particle.color, particle.alpha);
+    ellipse(particle.x, particle.y, particle.size);
+    noStroke();
+    if (particle.alpha <= 0) {
+      // remove particle if alpha becomes zero
+      particles.splice(i, 1);
+    }
+  }
 }
