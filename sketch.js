@@ -73,11 +73,11 @@ function draw() {
     for (let i = 0; i < ellipsePositions.length; i++) {
       let position = ellipsePositions[i];
       fill(position.fillColor);
+      noStroke();
       ellipse(position.x, position.y, position.size, position.size);
     }
 
     drawFingers();
-
   }
 }
 
