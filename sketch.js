@@ -2,6 +2,8 @@ let handpose;
 let video;
 let predictions = [];
 let modelLoaded = false;
+let ellipsePositions = [];
+
 function setup() {
   createCanvas(640, 480);
   video = createCapture(VIDEO);
@@ -18,6 +20,15 @@ function setup() {
 
   // Hide the video element, and just show the canvas
   video.hide();
+
+  // create random ellipses
+  for (let i = 0; i < 10; i++) {
+    let x = random(width);
+    let y = random(height);
+    let size = random(30, 70);
+    let fillColor = color(random(255), random(255), random(255));
+    ellipsePositions.push({ x: x, y: y, size: size, fillColor: fillColor });
+  }
 }
 
 function modelReady() {
@@ -26,17 +37,23 @@ function modelReady() {
 }
 
 function draw() {
-  frameRate(30);
+  frameRate(60);
   if (modelLoaded) {
     // mirror video and draw it to canvas
     translate(width, 0);
     scale(-1, 1);
     image(video, 0, 0, width, height);
 
+    // draw ellipses
+    for (let i = 0; i < ellipsePositions.length; i++) {
+      let position = ellipsePositions[i];
+      fill(position.fillColor);
+      ellipse(position.x, position.y, position.size, position.size);
+    }
+
     // We can call both functions to draw all keypoints and the skeletons
     // drawKeypoints();
     drawFingers();
-
   }
 }
 
