@@ -5,9 +5,11 @@ let modelLoaded = false;
 let ellipsePositions = [];
 let particles = [];
 let counter = 0;
+let canvas;
 
 function setup() {
-  createCanvas(640, 480);
+  canvas = createCanvas(640, 480);
+  canvas.parent('sketch-container');
   video = createCapture(VIDEO);
   video.size(width, height);
 
