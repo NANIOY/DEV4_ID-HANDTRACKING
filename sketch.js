@@ -4,6 +4,7 @@ let predictions = [];
 let modelLoaded = false;
 let ellipsePositions = [];
 let particles = [];
+let counter = 0;
 
 function setup() {
   createCanvas(640, 480);
@@ -73,6 +74,7 @@ function draw() {
     // We can call both functions to draw all keypoints and the skeletons
     // drawKeypoints();
     drawFingers();
+
   }
 }
 
@@ -104,6 +106,7 @@ function drawFingers() {
         createExplosion(position.x, position.y, position.fillColor);
         // remove the ellipse from positions array
         ellipsePositions.splice(i, 1);
+        counter++; // increase counter
         break;
       }
     }
@@ -122,6 +125,9 @@ function drawFingers() {
 
   // update and draw explosion particles
   updateExplosion();
+
+  // display counter
+  document.getElementById("counter").innerText = "Circles popped: " + counter;
 }
 
 // function to create explosion particles at given position
