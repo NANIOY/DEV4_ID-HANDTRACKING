@@ -90,6 +90,22 @@ function drawKeypoints() {
 
 function drawFingers() {
   console.log(predictions);
+
+  // remove ellipse if index finger is touching it
+  if (predictions[0] && predictions[0].hasOwnProperty('annotations')) {
+    let index4 = predictions[0].annotations.indexFinger[3];
+    for (let i = 0; i < ellipsePositions.length; i++) {
+      let position = ellipsePositions[i];
+      let distance = dist(index4[0], index4[1], position.x, position.y);
+      let minDistance = 10 + position.size / 2;
+      if (distance < minDistance) {
+        ellipsePositions.splice(i, 1);
+        break;
+      }
+    }
+  }
+
+  // draw circle on index finger
   push();
   rectMode(CORNERS);
   noStroke();
