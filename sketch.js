@@ -36,6 +36,9 @@ function setup() {
     }
     ellipsePositions.push({ x: x, y: y, size: size, fillColor: fillColor });
   }
+
+  // button event listener
+  document.getElementById("addCircles").addEventListener("click", addCircles);
 }
 
 // function to check if ellipse with other ellipse
@@ -71,23 +74,8 @@ function draw() {
       ellipse(position.x, position.y, position.size, position.size);
     }
 
-    // We can call both functions to draw all keypoints and the skeletons
-    // drawKeypoints();
     drawFingers();
 
-  }
-}
-
-// A function to draw ellipses over the detected keypoints
-function drawKeypoints() {
-  for (let i = 0; i < predictions.length; i += 1) {
-    const prediction = predictions[i];
-    for (let j = 0; j < prediction.landmarks.length; j += 1) {
-      const keypoint = prediction.landmarks[j];
-      fill(0, 255, 0);
-      noStroke();
-      ellipse(keypoint[0], keypoint[1], 10, 10);
-    }
   }
 }
 
@@ -160,5 +148,21 @@ function updateExplosion() {
       // remove particle if alpha becomes zero
       particles.splice(i, 1);
     }
+  }
+}
+
+// function to add random ellipses
+function addCircles() {
+  for (let i = 0; i < 5; i++) {
+    let x, y, size, fillColor;
+    let overlapping = true;
+    while (overlapping) {
+      x = random(width);
+      y = random(height);
+      size = random(30, 70);
+      fillColor = color(random(255), random(255), random(255));
+      overlapping = checkOverlap(x, y, size);
+    }
+    ellipsePositions.push({ x: x, y: y, size: size, fillColor: fillColor });
   }
 }
