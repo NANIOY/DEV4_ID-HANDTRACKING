@@ -15,22 +15,19 @@ function setup() {
 
   handpose = ml5.handpose(video, modelReady);
 
-  // This sets up an event that fills the global variable "predictions"
-  // with an array every time new hand poses are detected
   handpose.on("predict", results => {
     predictions = results;
   });
 
-  // Hide the video element, and just show the canvas
   video.hide();
 
-  // create random ellipses
+  const deadZone = 60;
   for (let i = 0; i < 10; i++) {
     let x, y, size, fillColor;
     let overlapping = true;
     while (overlapping) {
-      x = random(width);
-      y = random(height);
+      x = random(deadZone, width - deadZone);
+      y = random(deadZone, height - deadZone);
       size = random(30, 70);
       fillColor = color(random(255), random(255), random(255));
       overlapping = checkOverlap(x, y, size);
@@ -38,9 +35,9 @@ function setup() {
     ellipsePositions.push({ x: x, y: y, size: size, fillColor: fillColor });
   }
 
-  // button event listener
   document.getElementById("addCircles").addEventListener("click", addCircles);
 }
+
 
 // function to check if ellipse with other ellipse
 function checkOverlap(newX, newY, newSize) {
@@ -49,11 +46,12 @@ function checkOverlap(newX, newY, newSize) {
     let distance = dist(newX, newY, position.x, position.y);
     let minDistance = newSize / 2 + position.size / 2;
     if (distance < minDistance) {
-      return true; // overlapping with another ellipse
+      return true;
     }
   }
-  return false; // not overlapping
+  return false;
 }
+
 
 function modelReady() {
   console.log("Model ready!");
@@ -115,6 +113,10 @@ function drawHand() {
           }
         }
       });
+
+      if (isFist(annotations)) {
+        addCircles();
+      }
     }
   }
 
@@ -123,6 +125,20 @@ function drawHand() {
   document.getElementById("counter").innerText = "Circles popped: " + counter;
 }
 
+function isFist(annotations) {
+  const fingerTips = [
+    annotations.indexFinger[3],
+    annotations.middleFinger[3],
+    annotations.ringFinger[3],
+    annotations.pinky[3]
+  ];
+  const palmBase = annotations.palmBase[0];
+
+  return fingerTips.every(tip => {
+    const distance = dist(tip[0], tip[1], palmBase[0], palmBase[1]);
+    return distance < 60;
+  });
+}
 
 // function to create explosion particles at given position
 function createExplosion(x, y, color) {
@@ -157,18 +173,26 @@ function updateExplosion() {
   }
 }
 
-// function to add random ellipses
+let lastCircleTime = 0;
+const circleCooldown = 2000;
+
 function addCircles() {
-  for (let i = 0; i < 5; i++) {
-    let x, y, size, fillColor;
-    let overlapping = true;
-    while (overlapping) {
-      x = random(width);
-      y = random(height);
-      size = random(30, 70);
-      fillColor = color(random(255), random(255), random(255));
-      overlapping = checkOverlap(x, y, size);
+  const now = Date.now();
+  const deadZone = 40;
+  if (now - lastCircleTime > circleCooldown) {
+    for (let i = 0; i < 5; i++) {
+      let x, y, size, fillColor;
+      let overlapping = true;
+      while (overlapping) {
+        x = random(deadZone, width - deadZone);
+        y = random(deadZone, height - deadZone);
+        size = random(30, 70);
+        fillColor = color(random(255), random(255), random(255));
+        overlapping = checkOverlap(x, y, size);
+      }
+      ellipsePositions.push({ x: x, y: y, size: size, fillColor: fillColor });
     }
-    ellipsePositions.push({ x: x, y: y, size: size, fillColor: fillColor });
+    lastCircleTime = now;
   }
 }
+
