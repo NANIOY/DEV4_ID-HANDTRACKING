@@ -19,7 +19,6 @@ function setup() {
   // with an array every time new hand poses are detected
   handpose.on("predict", results => {
     predictions = results;
-    console.log(predictions);
   });
 
   // Hide the video element, and just show the canvas
@@ -62,7 +61,7 @@ function modelReady() {
 }
 
 function draw() {
-  frameRate(60);
+  frameRate(24);
   if (modelLoaded) {
     // mirror video and draw it to canvas
     translate(width, 0);
@@ -75,50 +74,55 @@ function draw() {
       fill(position.fillColor);
       noStroke();
       ellipse(position.x, position.y, position.size, position.size);
-    }
 
-    drawFingers();
-  }
-}
-
-function drawFingers() {
-  console.log(predictions);
-
-  // remove ellipse if index finger is touching it
-  if (predictions[0] && predictions[0].hasOwnProperty('annotations')) {
-    let index4 = predictions[0].annotations.indexFinger[3];
-    for (let i = 0; i < ellipsePositions.length; i++) {
-      let position = ellipsePositions[i];
-      let distance = dist(index4[0], index4[1], position.x, position.y);
-      let minDistance = 10 + position.size / 2;
-      if (distance < minDistance) {
-        // create explosion particles at position of ellipse
-        createExplosion(position.x, position.y, position.fillColor);
-        // remove the ellipse from positions array
-        ellipsePositions.splice(i, 1);
-        counter++; // increase counter
-        break;
+      if (i < ellipsePositions.length - 1) {
+        let nextPosition = ellipsePositions[i + 1];
+        stroke(255);
+        line(position.x, position.y, nextPosition.x, nextPosition.y);
       }
     }
+
+    drawHand();
+  }
+}
+
+function drawHand() {
+  if (predictions.length > 0 && predictions[0].hasOwnProperty('annotations')) {
+    const annotations = predictions[0].annotations;
+
+    fill(255, 0, 0);
+    noStroke();
+    for (const key in annotations) {
+      const points = annotations[key];
+      points.forEach(point => {
+        circle(point[0], point[1], 10);
+      });
+    }
+
+    for (const key in annotations) {
+      annotations[key].forEach(joint => {
+        let jointX = joint[0];
+        let jointY = joint[1];
+        for (let i = 0; i < ellipsePositions.length; i++) {
+          let position = ellipsePositions[i];
+          let distance = dist(jointX, jointY, position.x, position.y);
+          let minDistance = 10 + position.size / 2;
+          if (distance < minDistance) {
+            createExplosion(position.x, position.y, position.fillColor);
+            ellipsePositions.splice(i, 1);
+            counter++;
+            break;
+          }
+        }
+      });
+    }
   }
 
-  // draw circle on index finger
-  push();
-  rectMode(CORNERS);
-  noStroke();
-  fill(255, 0, 0);
-  if (predictions[0] && predictions[0].hasOwnProperty('annotations')) {
-    let index4 = predictions[0].annotations.indexFinger[3];
-    circle(index4[0], index4[1], 10);// index4[2]);
-  }
-  pop();
-
-  // update and draw explosion particles
   updateExplosion();
 
-  // display counter
   document.getElementById("counter").innerText = "Circles popped: " + counter;
 }
+
 
 // function to create explosion particles at given position
 function createExplosion(x, y, color) {
